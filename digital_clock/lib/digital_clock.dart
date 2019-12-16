@@ -15,20 +15,93 @@ enum _Element {
 }
 
 final _lightTheme = {
-  _Element.background: Color(0xFF81B3FE),
-  _Element.text: Colors.white,
-  _Element.shadow: Colors.black,
+  _Element.background: Colors.grey[350],
+  _Element.text: Colors.teal,
+  _Element.shadow: Colors.tealAccent,
 };
 
 final _darkTheme = {
-  _Element.background: Colors.black,
-  _Element.text: Colors.white,
-  _Element.shadow: Color(0xFF174EA6),
+  _Element.background: Colors.indigo,
+  _Element.text: Colors.tealAccent,
+  _Element.shadow: Colors.teal,
 };
 
-/// A basic digital clock.
-///
-/// You can do better than this!
+// bitmaps for each digit: 3 "pixels" horizontally X 5 "pixels" vertically
+const Map<String, List<List<bool>>> digitsBlueprints = {
+  ':': [[false, false, false], [false, true, false], [false, false, false], [false, true, false], [false, false, false]],
+  '0': [[true, true, true], [true, false, true], [true, false, true], [true, false, true], [true, true, true]],
+  '1': [[false, true, false], [true, true, false], [false, true, false], [false, true, false], [false, true, false]],
+  '2': [[true, true, true], [false, false, true], [true, true, true], [true, false, false], [true, true, true]],
+  '3': [[true, true, true], [false, false, true], [true, true, true], [false, false, true], [true, true, true]],
+  '4': [[true, false, true], [true, false, true], [true, true, true], [false, false, true], [false, false, true]],
+  '5': [[true, true, true], [true, false, false], [true, true, true], [false, false, true], [true, true, true]],
+  '6': [[true, true, true], [true, false, false], [true, true, true], [true, false, true], [true, true, true]],
+  '7': [[true, true, true], [false, false, true], [false, true, false], [false, true, false], [false, true, false]],
+  '8': [[true, true, true], [true, false, true], [true, true, true], [true, false, true], [true, true, true]],
+  '9': [[true, true, true], [true, false, true], [true, true, true], [false, false, true], [true, true, true]],
+};
+
+class DigitPixel extends StatelessWidget {
+  final bool lit;
+  final int rowNumber;
+  DigitPixel(this.lit, this.rowNumber);
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).brightness == Brightness.light
+        ? _lightTheme
+        : _darkTheme;
+    final pixelSizeMax = MediaQuery.of(context).size.width / 20;
+    final pixelSizeLit = pixelSizeMax / 5 * (rowNumber + 1);
+    return Padding(
+      padding: const EdgeInsets.all(0.5),
+      child: Container(
+        width: pixelSizeMax,
+        height: pixelSizeMax,
+        color: colors[_Element.background],
+        alignment: Alignment(0, 0),
+        child: Container(
+          width: pixelSizeLit,
+          height: pixelSizeLit,
+          color: lit ? colors[_Element.text] : colors[_Element.background],
+        ),
+      ),
+    );
+  }
+}
+
+class DigitVisualization extends StatelessWidget {
+  final String digit;
+  DigitVisualization(this.digit);
+
+  @override
+  Widget build(BuildContext context) {
+    List<List<bool>> _blueprint = digitsBlueprints[digit];
+    List<List<Widget>> _rows = [];
+    int _index = 0;
+    _blueprint.forEach((List<bool> blueprintRow){
+      List<Widget> _row = [];
+      blueprintRow.forEach((bool pixelValue) {
+        _row.add(DigitPixel(pixelValue, _index));
+      });
+      _index++;
+      _rows.add(_row);
+    });
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: _rows.map((List<Widget> _row) =>
+            Row(
+              children: _row,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+            )
+        ).toList(),
+      ),
+    );
+  }
+}
+
 class DigitalClock extends StatefulWidget {
   const DigitalClock(this.model);
 
@@ -98,37 +171,27 @@ class _DigitalClockState extends State<DigitalClock> {
     final colors = Theme.of(context).brightness == Brightness.light
         ? _lightTheme
         : _darkTheme;
-    final hour =
-        DateFormat(widget.model.is24HourFormat ? 'HH' : 'hh').format(_dateTime);
+    final hour = DateFormat(widget.model.is24HourFormat ? 'HH' : 'hh')
+        .format(_dateTime);
     final minute = DateFormat('mm').format(_dateTime);
-    final fontSize = MediaQuery.of(context).size.width / 3.5;
-    final offset = -fontSize / 7;
-    final defaultStyle = TextStyle(
-      color: colors[_Element.text],
-      fontFamily: 'PressStart2P',
-      fontSize: fontSize,
-      shadows: [
-        Shadow(
-          blurRadius: 0,
-          color: colors[_Element.shadow],
-          offset: Offset(10, 0),
-        ),
-      ],
-    );
 
     return Container(
-      color: colors[_Element.background],
-      child: Center(
-        child: DefaultTextStyle(
-          style: defaultStyle,
-          child: Stack(
-            children: <Widget>[
-              Positioned(left: offset, top: 0, child: Text(hour)),
-              Positioned(right: offset, bottom: offset, child: Text(minute)),
-            ],
-          ),
-        ),
-      ),
+        color: colors[_Element.background],
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                DigitVisualization(hour[0]),
+                DigitVisualization(hour[1]),
+                DigitVisualization(':'),
+                DigitVisualization(minute[0]),
+                DigitVisualization(minute[1]),
+              ],
+            ),
+          ],
+        )
     );
   }
 }
