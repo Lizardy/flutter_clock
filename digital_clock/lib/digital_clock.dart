@@ -15,7 +15,7 @@ enum _Element {
 }
 
 final _lightTheme = {
-  _Element.background: Colors.grey[350],
+  _Element.background: Colors.grey[300],
   _Element.text: Colors.teal,
   _Element.shadow: Colors.tealAccent,
 };
@@ -52,7 +52,7 @@ class DigitPixel extends StatelessWidget {
         ? _lightTheme
         : _darkTheme;
     final pixelSizeMax = MediaQuery.of(context).size.width / 20;
-    final pixelSizeLit = pixelSizeMax / 5 * (rowNumber + 1);
+    final pixelSizeLit = pixelSizeMax / 5 * (rowNumber + 1.5);
     return Padding(
       padding: const EdgeInsets.all(0.5),
       child: Container(
