@@ -16,13 +16,13 @@ enum _Element {
 
 final _lightTheme = {
   _Element.background: Colors.grey[300],
-  _Element.text: Colors.teal,
-  _Element.shadow: Colors.tealAccent,
+  _Element.text: Colors.teal[700],
+  _Element.shadow: Colors.tealAccent[100],
 };
 
 final _darkTheme = {
-  _Element.background: Colors.indigo,
-  _Element.text: Colors.tealAccent,
+  _Element.background: Colors.indigo[900],
+  _Element.text: Colors.tealAccent[100],
   _Element.shadow: Colors.teal,
 };
 
@@ -58,7 +58,7 @@ class DigitPixel extends StatelessWidget {
       child: Container(
         width: pixelSizeMax,
         height: pixelSizeMax,
-        color: colors[_Element.background],
+        color: lit ? colors[_Element.shadow] : colors[_Element.background],
         alignment: Alignment(0, 0),
         child: Container(
           width: pixelSizeLit,
