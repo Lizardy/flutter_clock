@@ -28,7 +28,6 @@ final _darkTheme = {
 
 // bitmaps for each digit: 3 "pixels" horizontally X 5 "pixels" vertically
 const Map<String, List<List<bool>>> digitsBlueprints = {
-  ':': [[false, false, false], [false, true, false], [false, false, false], [false, true, false], [false, false, false]],
   '0': [[true, true, true], [true, false, true], [true, false, true], [true, false, true], [true, true, true]],
   '1': [[false, true, false], [true, true, false], [false, true, false], [false, true, false], [false, true, false]],
   '2': [[true, true, true], [false, false, true], [true, true, true], [true, false, false], [true, true, true]],
@@ -40,6 +39,23 @@ const Map<String, List<List<bool>>> digitsBlueprints = {
   '8': [[true, true, true], [true, false, true], [true, true, true], [true, false, true], [true, true, true]],
   '9': [[true, true, true], [true, false, true], [true, true, true], [false, false, true], [true, true, true]],
 };
+
+const List<List<List<int>>> dividerBlueprints = [
+  [
+    [0, 0, 0],
+    [0, 2, 0],
+    [0, 0, 0],
+    [0, 4, 0],
+    [0, 0, 0]
+  ],
+  [
+    [0, 0, 0],
+    [0, 4, 0],
+    [0, 0, 0],
+    [0, 2, 0],
+    [0, 0, 0]
+  ],
+];
 
 class DigitPixel extends StatelessWidget {
   final bool lit;
@@ -55,15 +71,19 @@ class DigitPixel extends StatelessWidget {
     final pixelSizeLit = pixelSizeMax / 5 * (rowNumber + 1.5);
     return Padding(
       padding: const EdgeInsets.all(0.5),
-      child: Container(
+      child: AnimatedContainer(
+        duration: Duration(seconds: 1),
+        curve: Curves.ease,
         width: pixelSizeMax,
         height: pixelSizeMax,
         color: lit ? colors[_Element.shadow] : colors[_Element.background],
         alignment: Alignment(0, 0),
-        child: Container(
-          width: pixelSizeLit,
-          height: pixelSizeLit,
-          color: lit ? colors[_Element.text] : colors[_Element.background],
+        child: AnimatedContainer(
+          duration: Duration(seconds: 2),
+          curve: Curves.ease,
+          width: lit ? pixelSizeLit : 0,
+          height: lit ? pixelSizeLit : 0,
+          color: colors[_Element.text],
         ),
       ),
     );
@@ -85,6 +105,69 @@ class DigitVisualization extends StatelessWidget {
         _row.add(DigitPixel(pixelValue, _index));
       });
       _index++;
+      _rows.add(_row);
+    });
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: _rows.map((List<Widget> _row) =>
+            Row(
+              children: _row,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+            )
+        ).toList(),
+      ),
+    );
+  }
+}
+
+class DividerPixel extends StatelessWidget {
+  final int litMultiplier;
+  DividerPixel(this.litMultiplier);
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).brightness == Brightness.light
+        ? _lightTheme
+        : _darkTheme;
+    final bool lit = litMultiplier > 0 ? true : false;
+    final pixelSizeMax = MediaQuery.of(context).size.width / 20;
+    final pixelSizeLit = pixelSizeMax / 5 * (litMultiplier + 0.5);
+    return Padding(
+      padding: const EdgeInsets.all(0.5),
+      child: Container(
+        width: pixelSizeMax,
+        height: pixelSizeMax,
+        color: lit ? colors[_Element.shadow] : colors[_Element.background],
+        alignment: Alignment(0, 0),
+        child: AnimatedContainer(
+          duration: Duration(seconds: 1),
+          curve: Curves.ease,
+          width: pixelSizeLit,
+          height: pixelSizeLit,
+          color: lit ? colors[_Element.text] : colors[_Element.background],
+        ),
+      ),
+    );
+  }
+}
+
+class DividerVisualization extends StatelessWidget {
+  final isSecondEven;
+  DividerVisualization(this.isSecondEven);
+
+  @override
+  Widget build(BuildContext context) {
+    List<List<int>> _blueprint = isSecondEven
+        ? dividerBlueprints.first
+        : dividerBlueprints.last;
+    List<List<Widget>> _rows = [];
+    _blueprint.forEach((List<int> blueprintRow){
+      List<Widget> _row = [];
+      blueprintRow.forEach((int pixelValue) {
+        _row.add(DividerPixel(pixelValue));
+      });
       _rows.add(_row);
     });
     return Padding(
@@ -151,18 +234,18 @@ class _DigitalClockState extends State<DigitalClock> {
       _dateTime = DateTime.now();
       // Update once per minute. If you want to update every second, use the
       // following code.
-      _timer = Timer(
-        Duration(minutes: 1) -
-            Duration(seconds: _dateTime.second) -
-            Duration(milliseconds: _dateTime.millisecond),
-        _updateTime,
-      );
+//      _timer = Timer(
+//        Duration(minutes: 1) -
+//            Duration(seconds: _dateTime.second) -
+//            Duration(milliseconds: _dateTime.millisecond),
+//        _updateTime,
+//      );
       // Update once per second, but make sure to do it at the beginning of each
       // new second, so that the clock is accurate.
-      // _timer = Timer(
-      //   Duration(seconds: 1) - Duration(milliseconds: _dateTime.millisecond),
-      //   _updateTime,
-      // );
+       _timer = Timer(
+         Duration(seconds: 1) - Duration(milliseconds: _dateTime.millisecond),
+         _updateTime,
+       );
     });
   }
 
@@ -174,6 +257,7 @@ class _DigitalClockState extends State<DigitalClock> {
     final hour = DateFormat(widget.model.is24HourFormat ? 'HH' : 'hh')
         .format(_dateTime);
     final minute = DateFormat('mm').format(_dateTime);
+    final isSecondEven = _dateTime.second % 2 == 0 ? true : false;
 
     return Container(
         color: colors[_Element.background],
@@ -185,7 +269,7 @@ class _DigitalClockState extends State<DigitalClock> {
               children: [
                 DigitVisualization(hour[0]),
                 DigitVisualization(hour[1]),
-                DigitVisualization(':'),
+                DividerVisualization(isSecondEven),
                 DigitVisualization(minute[0]),
                 DigitVisualization(minute[1]),
               ],
