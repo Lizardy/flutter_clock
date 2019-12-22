@@ -9,21 +9,24 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 enum _Element {
-  background,
+  backgroundStartGradient,
+  backgroundEndGradient,
   text,
   shadow,
 }
 
 final _lightTheme = {
-  _Element.background: Colors.grey[300],
+  _Element.backgroundStartGradient: Colors.grey[50],
+  _Element.backgroundEndGradient: Colors.grey[300],
   _Element.text: Colors.teal[700],
   _Element.shadow: Colors.tealAccent[100],
 };
 
 final _darkTheme = {
-  _Element.background: Colors.indigo[900],
+  _Element.backgroundStartGradient: Colors.indigo[900],
+  _Element.backgroundEndGradient: Colors.indigo[700],
   _Element.text: Colors.tealAccent[100],
-  _Element.shadow: Colors.teal,
+  _Element.shadow: Colors.tealAccent[700],
 };
 
 // bitmaps for each digit: 3 "pixels" horizontally X 5 "pixels" vertically
@@ -76,7 +79,9 @@ class DigitPixel extends StatelessWidget {
         curve: Curves.ease,
         width: pixelSizeMax,
         height: pixelSizeMax,
-        color: lit ? colors[_Element.shadow] : colors[_Element.background],
+        color: lit
+            ? colors[_Element.shadow]
+            : colors[_Element.backgroundEndGradient].withOpacity(0.0),
         alignment: Alignment(0, 0),
         child: AnimatedContainer(
           duration: Duration(seconds: 2),
@@ -139,14 +144,18 @@ class DividerPixel extends StatelessWidget {
       child: Container(
         width: pixelSizeMax,
         height: pixelSizeMax,
-        color: lit ? colors[_Element.shadow] : colors[_Element.background],
+        color: lit
+            ? colors[_Element.shadow]
+            : colors[_Element.backgroundEndGradient].withOpacity(0.0),
         alignment: Alignment(0, 0),
         child: AnimatedContainer(
           duration: Duration(seconds: 1),
           curve: Curves.ease,
           width: pixelSizeLit,
           height: pixelSizeLit,
-          color: lit ? colors[_Element.text] : colors[_Element.background],
+          color: lit
+              ? colors[_Element.text]
+              : colors[_Element.backgroundEndGradient].withOpacity(0.0),
         ),
       ),
     );
@@ -260,7 +269,16 @@ class _DigitalClockState extends State<DigitalClock> {
     final isSecondEven = _dateTime.second % 2 == 0 ? true : false;
 
     return Container(
-        color: colors[_Element.background],
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              colors[_Element.backgroundStartGradient],
+              colors[_Element.backgroundEndGradient]
+            ],
+          )
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
