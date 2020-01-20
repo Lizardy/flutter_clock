@@ -206,6 +206,10 @@ class _DigitVisualizationState extends State<DigitVisualization> {
 
   @override
   Widget build(BuildContext context) {
+    final num padding = (MediaQuery.of(context).size.width / 15 -
+            MediaQuery.of(context).size.width / 20) /
+        5;
+
     if (oldDigit != widget.digit) init();
     List<List<Widget>> _rows = [];
     int step = widget.second - 6 * (widget.second / 6).floor();
@@ -225,7 +229,7 @@ class _DigitVisualizationState extends State<DigitVisualization> {
     }
 
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.all(padding),
       child: Column(
         children: _rows
             .map((List<Widget> _row) => Row(
@@ -282,6 +286,9 @@ class DividerVisualization extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final num padding = (MediaQuery.of(context).size.width / 15 -
+            MediaQuery.of(context).size.width / 20) /
+        5;
     List<List<int>> _blueprint =
         isSecondEven ? dividerBlueprints.first : dividerBlueprints.last;
     List<List<Widget>> _rows = [];
@@ -293,7 +300,7 @@ class DividerVisualization extends StatelessWidget {
       _rows.add(_row);
     });
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.all(padding),
       child: Column(
         children: _rows
             .map((List<Widget> _row) => Row(
