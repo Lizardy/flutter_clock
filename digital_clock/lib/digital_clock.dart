@@ -121,6 +121,8 @@ const List<List<List<int>>> dividerBlueprints = [
   ],
 ];
 
+const List digitsAnimationOffsets = [4, 3, 1, 0]; // [0;5]
+
 class DigitPixel extends StatelessWidget {
   final num pixelSizeMax;
   final num pixelSizeLit;
@@ -158,8 +160,9 @@ class DigitPixel extends StatelessWidget {
 class DigitVisualization extends StatefulWidget {
   final String digit;
   final int second;
+  final int digitAnimationOffset;
 
-  DigitVisualization(this.digit, this.second);
+  DigitVisualization(this.digit, this.second, this.digitAnimationOffset);
 
   @override
   _DigitVisualizationState createState() => _DigitVisualizationState();
@@ -213,6 +216,8 @@ class _DigitVisualizationState extends State<DigitVisualization> {
     if (oldDigit != widget.digit) init();
     List<List<Widget>> _rows = [];
     int step = widget.second - 6 * (widget.second / 6).floor();
+    step = step + widget.digitAnimationOffset; // to "randomize" animation start
+    step = step > 5 ? step - 6 : step; // to "randomize" animation start
     num pixelSizeMax = MediaQuery.of(context).size.width / 20;
     for (int j = 1; j <= 5; j++) {
       List<Widget> _row = [];
@@ -405,11 +410,13 @@ class _DigitalClockState extends State<DigitalClock> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                DigitVisualization(hour[0], second),
-                DigitVisualization(hour[1], second),
+                DigitVisualization(hour[0], second, digitsAnimationOffsets[0]),
+                DigitVisualization(hour[1], second, digitsAnimationOffsets[1]),
                 DividerVisualization(isSecondEven),
-                DigitVisualization(minute[0], second),
-                DigitVisualization(minute[1], second),
+                DigitVisualization(
+                    minute[0], second, digitsAnimationOffsets[2]),
+                DigitVisualization(
+                    minute[1], second, digitsAnimationOffsets[3]),
               ],
             ),
           ],
