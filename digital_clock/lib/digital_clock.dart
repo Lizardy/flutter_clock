@@ -410,13 +410,19 @@ class _DigitalClockState extends State<DigitalClock> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                DigitVisualization(hour[0], second, digitsAnimationOffsets[0]),
-                DigitVisualization(hour[1], second, digitsAnimationOffsets[1]),
-                DividerVisualization(isSecondEven),
-                DigitVisualization(
-                    minute[0], second, digitsAnimationOffsets[2]),
-                DigitVisualization(
-                    minute[1], second, digitsAnimationOffsets[3]),
+                Expanded(
+                    child: DigitVisualization(
+                        hour[0], second, digitsAnimationOffsets[0])),
+                Expanded(
+                    child: DigitVisualization(
+                        hour[1], second, digitsAnimationOffsets[1])),
+                Expanded(child: DividerVisualization(isSecondEven)),
+                Expanded(
+                    child: DigitVisualization(
+                        minute[0], second, digitsAnimationOffsets[2])),
+                Expanded(
+                    child: DigitVisualization(
+                        minute[1], second, digitsAnimationOffsets[3])),
               ],
             ),
           ],
